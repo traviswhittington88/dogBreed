@@ -2,33 +2,53 @@
 
 function retrieveInput(){
     
-    let howMany = $('#js-input').val();
-    console.log(`You chose to display ${howMany} dogs!`);
-    if(howMany >= 1 && howMany <= 50){
-        getDogImages(howMany);
+    let breed = $('#js-input').val().toLowerCase().toString();
+    if(breed.length == 0) {
+        alert("You didn't enter a breed, try again");
+        
+
+        
     }
     else{
-     let howMany = 3;
-      getDogImages(howMany);
+    getDogImages(breed);
     }
+
 
 }
 
-function getDogImages(numOfDogs){
-    for(let i = 1; i <= numOfDogs; i++){
-       fetch('https://dog.ceo/api/breeds/image/random').
-       then(response => response.json()).
-       then(responseJson => displayResults(responseJson)).
-       catch(alert("Sorry an unexpected error occured. Try again later."));
-
-    }
-}
+function getDogImages(type){
     
+       console.log(`The breed of dog is ${type}`);
+       fetch(`https://dog.ceo/api/breed/${type}/images/random`)
+       .then(function(response){
+           if(!response.ok){
+             throw Error("This breed does not exist, try again. Please check spelling or visit https://dog.ceo/dog-api/breeds-list to get exact naming convention.");
+            }
+            return response;
+        })
+        .then(response => response.json())
+       .then(responseJson => getResults(responseJson))
+       .catch(error => alert(error));
+       
+        displayResults();
+    
+    
+    }
 
-function displayResults(jsonMessage){
-    $('img-results').replaceWith(`<img src = "${jsonMessage}" class = "img-results">`);
-    $('results').removeClass("hidden");
+
+function getResults(jsonMessage){
+    let url = jsonMessage.message;
+    console.log(url);
+    $(".results").append(`<img src = "${url}" class = "img-results">`);
+
+   // $('.img-results').replaceWith(`<img src = "${url}" class = "img-results">`);
+
 }
+
+function displayResults(){
+    $('.results').removeClass("hidden"); 
+
+    }  
 
 
 
@@ -41,6 +61,6 @@ function watchForm(){
 
 $(function(){
     console.log("App ready and waiting for submit");
-    retrieveInput();
-
+    watchForm();
+    
 });
